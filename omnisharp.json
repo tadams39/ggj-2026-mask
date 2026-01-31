@@ -1,0 +1,10 @@
+{
+  "solution": "GGJ2026.sln",
+  "enableEditorConfigSupport": true,
+  "enableMsBuildLoadProjectsOnDemand": false,
+  "enableRoslynAnalyzers": true,
+  "organizeImportsOnFormat": false,
+  "enableImportCompletion": true,
+  "sdkIncludePrereleases": true,
+  "analyzeOpenDocumentsOnly": false
+}
