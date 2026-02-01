@@ -190,9 +190,15 @@ public class SledController : MonoBehaviour
     {
         if (Mathf.Abs(horizontalInput) < 0.01f) return;
 
-        // Calculate speed-dependent steering reduction
+        // Calculate speed-dependent steering
+        // Reduce steering at very low speeds (less twitchy) AND at high speeds (wider turns)
         float speedFactor = Mathf.Clamp01(currentSpeed / speedForFullReduction);
-        float steeringMultiplier = Mathf.Lerp(1f, minSteerFactor, speedFactor);
+
+        // At low speeds (< 3 m/s), reduce steering power
+        float lowSpeedFactor = Mathf.Clamp01(currentSpeed / 3f);
+
+        // Combine both factors: low speed reduction and high speed reduction
+        float steeringMultiplier = Mathf.Lerp(1f, minSteerFactor, speedFactor) * Mathf.Lerp(0.3f, 1f, lowSpeedFactor);
 
         // Apply torque for steering
         float steerTorque = horizontalInput * steerStrength * steeringMultiplier;
@@ -252,22 +258,32 @@ public class SledController : MonoBehaviour
 
     private void ApplyAdditionalGravity()
     {
-        // Apply extra downward force for faster, more dramatic downhill movement
-        Vector3 extraGravity = Vector3.down * additionalGravity;
-        rb.AddForce(extraGravity, ForceMode.Acceleration);
-
-        // Apply slope-directed gravity (always pull down the slope)
         if (groundDetector.IsGrounded)
         {
+            // When grounded: apply moderate extra gravity + slope acceleration
+            Vector3 extraGravity = Vector3.down * additionalGravity;
+            rb.AddForce(extraGravity, ForceMode.Acceleration);
+
             Vector3 groundNormal = groundDetector.GroundNormal;
 
             // Calculate downslope direction (perpendicular to ground normal, in the plane)
             Vector3 downslope = Vector3.ProjectOnPlane(Vector3.down, groundNormal).normalized;
 
-            // Apply force down the slope (stronger on steeper slopes)
+            // Calculate slope steepness
             float slopeSteepness = Vector3.Angle(Vector3.up, groundNormal) / 90f; // 0 = flat, 1 = vertical
-            Vector3 slopeForce = downslope * additionalGravity * slopeGravityMultiplier * slopeSteepness;
-            rb.AddForce(slopeForce, ForceMode.Acceleration);
+
+            // Calculate forward component of the downslope (how much it accelerates us forward)
+            Vector3 forwardSlope = Vector3.ProjectOnPlane(downslope, Vector3.up).normalized;
+
+            // Apply forward force based on slope steepness (sled accelerates downhill!)
+            Vector3 downhillAcceleration = forwardSlope * additionalGravity * slopeGravityMultiplier * slopeSteepness;
+            rb.AddForce(downhillAcceleration, ForceMode.Acceleration);
+        }
+        else
+        {
+            // When airborne: apply gentler gravity to allow for jumps and airtime
+            Vector3 airGravity = Vector3.down * (additionalGravity * 0.4f); // 40% of normal gravity
+            rb.AddForce(airGravity, ForceMode.Acceleration);
         }
     }
 
