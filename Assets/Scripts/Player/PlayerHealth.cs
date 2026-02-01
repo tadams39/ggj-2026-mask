@@ -9,6 +9,7 @@ public class PlayerHealth : MonoBehaviour
     [SerializeField] private float obstacleDamage = 25f;
     [SerializeField] private float invulnerabilityDuration = 1f;
 
+    [SerializeField]
     private float currentHealth;
     private float invulnerabilityTimer = 0f;
     private SledController sledController;
@@ -29,6 +30,7 @@ public class PlayerHealth : MonoBehaviour
 
         // Subscribe to events
         GameEvents.OnDamageTaken += HandleDamage;
+        GameEvents.OnDamageOverTime += HandleDamageOverTime;
         GameEvents.OnGameReset += HandleGameReset;
         GameEvents.OnLevelReset += HandleLevelReset;
     }
@@ -36,6 +38,7 @@ public class PlayerHealth : MonoBehaviour
     private void OnDestroy()
     {
         GameEvents.OnDamageTaken -= HandleDamage;
+        GameEvents.OnDamageOverTime -= HandleDamageOverTime;
         GameEvents.OnGameReset -= HandleGameReset;
         GameEvents.OnLevelReset -= HandleLevelReset;
     }
@@ -48,6 +51,7 @@ public class PlayerHealth : MonoBehaviour
         }
     }
 
+    // Obstacle damage - resets level on hit
     private void HandleDamage(float damage)
     {
         // Check if invulnerable (either from timer or from powerup)
@@ -76,6 +80,27 @@ public class PlayerHealth : MonoBehaviour
             // Just took damage - reset level only
             Debug.Log("Player hit obstacle! Resetting level.");
             GameEvents.TriggerLevelReset();
+        }
+    }
+
+    // Continuous damage (fog) - no level reset, just health drain
+    private void HandleDamageOverTime(float damage)
+    {
+        // Invincibility powerup blocks fog damage too
+        if (sledController != null && sledController.IsInvincible)
+        {
+            return;
+        }
+
+        currentHealth -= damage;
+        currentHealth = Mathf.Max(0f, currentHealth);
+
+        if (currentHealth <= 0f)
+        {
+            // Player died from fog - full game reset
+            Debug.Log("Player died from fog! Triggering full game reset.");
+            GameEvents.TriggerPlayerDeath();
+            GameEvents.TriggerGameReset();
         }
     }
 

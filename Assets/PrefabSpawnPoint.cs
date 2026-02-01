@@ -13,7 +13,7 @@ public class PrefabSpawnPoint : MonoBehaviour
     {
         if (prefabInstance)
         {
-            DestroyImmediate(prefabInstance);
+            Destroy(prefabInstance.gameObject);
         }
     }
 

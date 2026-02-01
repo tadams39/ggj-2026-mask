@@ -3,7 +3,8 @@ using System;
 public static class GameEvents
 {
     // Health events
-    public static event Action<float> OnDamageTaken;
+    public static event Action<float> OnDamageTaken;      // Obstacle damage - resets level
+    public static event Action<float> OnDamageOverTime;   // Continuous damage (fog) - no reset
     public static event Action OnPlayerDeath;
     public static event Action OnGameReset;       // Full reset (death) - resets score
     public static event Action OnLevelReset;      // Level only (R key) - preserves score
@@ -19,6 +20,7 @@ public static class GameEvents
 
     // Invoke methods for safe event triggering
     public static void TriggerDamage(float amount) => OnDamageTaken?.Invoke(amount);
+    public static void TriggerDamageOverTime(float amount) => OnDamageOverTime?.Invoke(amount);
     public static void TriggerPlayerDeath() => OnPlayerDeath?.Invoke();
     public static void TriggerGameReset() => OnGameReset?.Invoke();
     public static void TriggerLevelReset() => OnLevelReset?.Invoke();

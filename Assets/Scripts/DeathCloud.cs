@@ -2,41 +2,51 @@ using UnityEngine;
 
 public class DeathCloud : MonoBehaviour
 {
-    [Header("Chase Settings")]
-    [SerializeField] private float maxSecondsAway = 10f;
-    [SerializeField] private float initialSpeedMultiplier = 1f;
-    [SerializeField] private float speedAcceleration = 0.01f; // Speed increase per second
+    [Header("Speed Settings")]
+    public float minSpeed = 10f;
+    public float maxSpeed = 20f;
+    public float timeToMaxSpeed = 300f; // 5 minutes in seconds
+
+    [Header("Distance Settings")]
+    public float maxDistanceFromPlayer = 100f;
+    public float damageRadius = 15f; // Player takes damage when within this radius
 
     [Header("Damage Settings")]
-    [SerializeField] private float damagePerSecond = 20f;
+    public float damagePerSecond = 1f;
 
     [Header("Visual Settings")]
-    [SerializeField] private float cloudHeight = 2f;
+    public float cloudHeight = 2f;
+
+    [Header("Debug")]
+    public bool logDistance = false;
 
     private Transform playerTransform;
     private SledController sledController;
-    private float currentSpeedMultiplier;
-    private bool playerInCloud = false;
+    private float elapsedTime = 0f;
+
+    private float CurrentSpeed
+    {
+        get
+        {
+            float t = Mathf.Clamp01(elapsedTime / timeToMaxSpeed);
+            return Mathf.Lerp(minSpeed, maxSpeed, t);
+        }
+    }
 
     private void Start()
     {
-        // Subscribe to events
         GameEvents.OnGameReset += HandleGameReset;
         GameEvents.OnLevelReset += HandleLevelReset;
 
-        // Find player
         sledController = FindFirstObjectByType<SledController>();
         if (sledController != null)
         {
             playerTransform = sledController.transform;
         }
 
-        currentSpeedMultiplier = initialSpeedMultiplier;
-
-        // Initial positioning
         if (playerTransform != null)
         {
-            PositionBehindPlayer();
+            PositionAtMaxDistance();
         }
     }
 
@@ -50,89 +60,79 @@ public class DeathCloud : MonoBehaviour
     {
         if (playerTransform == null || sledController == null) return;
 
-        // Gradually increase speed over time
-        currentSpeedMultiplier += speedAcceleration * Time.deltaTime;
+        // Track elapsed time for speed ramping
+        elapsedTime += Time.deltaTime;
 
-        // Calculate target position based on player speed
-        float playerSpeed = Mathf.Max(sledController.Speed, 5f); // Minimum speed for calculation
-        float targetDistance = maxSecondsAway * playerSpeed;
+        Vector3 targetPosition = playerTransform.position;
+        targetPosition.y += cloudHeight;
 
-        // Get player's backward direction
-        Vector3 playerBackward = -sledController.GetForwardDirection();
-        Vector3 targetPosition = playerTransform.position + playerBackward * targetDistance;
-        targetPosition.y = playerTransform.position.y + cloudHeight;
+        float currentDistance = Vector3.Distance(transform.position, playerTransform.position);
 
-        // Move toward target position (cloud accelerates to catch up)
-        float cloudSpeed = playerSpeed * currentSpeedMultiplier;
-        Vector3 direction = (targetPosition - transform.position).normalized;
-        float distanceToTarget = Vector3.Distance(transform.position, targetPosition);
-
-        // Move faster when far from target, slower when close
-        float catchUpFactor = Mathf.Clamp01(distanceToTarget / targetDistance);
-        float actualSpeed = cloudSpeed * (1f + catchUpFactor);
-
-        transform.position = Vector3.MoveTowards(transform.position, targetPosition, actualSpeed * Time.deltaTime);
-
-        // Apply damage if player is in the cloud
-        if (playerInCloud)
+        // Rubber band: if too far away, snap to max distance
+        if (currentDistance > maxDistanceFromPlayer)
         {
-            GameEvents.TriggerDamage(damagePerSecond * Time.deltaTime);
+            Vector3 directionToPlayer = (targetPosition - transform.position).normalized;
+            transform.position = targetPosition - directionToPlayer * maxDistanceFromPlayer;
+            currentDistance = maxDistanceFromPlayer;
         }
-    }
 
-    private void OnTriggerEnter(Collider other)
-    {
-        if (other.GetComponent<SledController>() != null)
+        // Move toward player at fixed speed
+        float speed = CurrentSpeed;
+        transform.position = Vector3.MoveTowards(transform.position, targetPosition, speed * Time.deltaTime);
+
+        // Recalculate distance after movement
+        currentDistance = Vector3.Distance(transform.position, playerTransform.position);
+
+        // Apply damage if player is within damage radius
+        if (currentDistance <= damageRadius)
         {
-            playerInCloud = true;
-            Debug.Log("Player entered death cloud!");
+            GameEvents.TriggerDamageOverTime(damagePerSecond * Time.deltaTime);
+
+            if (logDistance)
+            {
+                Debug.Log($"[DeathCloud] DAMAGING PLAYER! Distance: {currentDistance:F1}m");
+            }
         }
-    }
-
-    private void OnTriggerExit(Collider other)
-    {
-        if (other.GetComponent<SledController>() != null)
+        else if (logDistance)
         {
-            playerInCloud = false;
-            Debug.Log("Player escaped death cloud!");
+            Debug.Log($"[DeathCloud] Distance: {currentDistance:F1}m, Speed: {speed:F1}m/s, Time: {elapsedTime:F0}s");
         }
     }
 
     private void HandleGameReset()
     {
-        // Full reset - reset speed multiplier and position
-        currentSpeedMultiplier = initialSpeedMultiplier;
-        playerInCloud = false;
-        PositionBehindPlayer();
+        // Full reset - reset timer and position
+        elapsedTime = 0f;
+        PositionAtMaxDistance();
     }
 
     private void HandleLevelReset()
     {
-        // Level reset - just reposition, keep speed multiplier
-        playerInCloud = false;
-        PositionBehindPlayer();
+        // Level reset - reposition but keep timer
+        PositionAtMaxDistance();
     }
 
-    private void PositionBehindPlayer()
+    private void PositionAtMaxDistance()
     {
         if (playerTransform == null || sledController == null) return;
 
-        float playerSpeed = Mathf.Max(sledController.Speed, 5f);
-        float targetDistance = maxSecondsAway * playerSpeed;
-
         Vector3 playerBackward = -sledController.GetForwardDirection();
-        Vector3 targetPosition = playerTransform.position + playerBackward * targetDistance;
+        Vector3 targetPosition = playerTransform.position + playerBackward * maxDistanceFromPlayer;
         targetPosition.y = playerTransform.position.y + cloudHeight;
 
         transform.position = targetPosition;
     }
 
-    public float GetSecondsAway()
+    public float GetDistanceFromPlayer()
     {
-        if (playerTransform == null || sledController == null) return maxSecondsAway;
+        if (playerTransform == null) return maxDistanceFromPlayer;
+        return Vector3.Distance(transform.position, playerTransform.position);
+    }
 
-        float distance = Vector3.Distance(transform.position, playerTransform.position);
-        float playerSpeed = Mathf.Max(sledController.Speed, 1f);
-        return distance / playerSpeed;
+    private void OnDrawGizmosSelected()
+    {
+        // Visualize damage radius in editor
+        Gizmos.color = new Color(1f, 0f, 0f, 0.3f);
+        Gizmos.DrawSphere(transform.position, damageRadius);
     }
 }

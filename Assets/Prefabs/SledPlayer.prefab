@@ -121,6 +121,7 @@ MonoBehaviour:
   showDebugGizmos: 1
   showDebugUI: 1
   logInput: 0
+  jumpForce: 300
 --- !u!135 &6071074673167817361
 SphereCollider:
   m_ObjectHideFlags: 0

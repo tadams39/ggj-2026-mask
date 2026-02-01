@@ -11,8 +11,8 @@ GameObject:
   - component: {fileID: 7937042437775060614}
   - component: {fileID: 6364516164102647027}
   - component: {fileID: 6213218957000192423}
-  - component: {fileID: 3009679976765395009}
   - component: {fileID: 3952304660895126099}
+  - component: {fileID: 3144542171710118984}
   m_Layer: 0
   m_Name: PrefabBase-BareTree2
   m_TagString: Untagged
@@ -89,8 +89,26 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!135 &3009679976765395009
-SphereCollider:
+--- !u!114 &3952304660895126099
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3743258704361158890}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 419ee1ab9c9f6ef4d961b4a952c6f487, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  myType: 0
+  pickupType: 0
+  obstacleDamage: 25
+  audioSource: {fileID: 0}
+  collectSound: {fileID: 0}
+  logCollisions: 1
+--- !u!136 &3144542171710118984
+CapsuleCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -106,23 +124,12 @@ SphereCollider:
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
-  m_Enabled: 0
-  serializedVersion: 3
-  m_Radius: 0.5
-  m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &3952304660895126099
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3743258704361158890}
   m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 419ee1ab9c9f6ef4d961b4a952c6f487, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  myType: 0
+  serializedVersion: 2
+  m_Radius: 0.15
+  m_Height: 3.2605233
+  m_Direction: 1
+  m_Center: {x: 0, y: 0.77357745, z: 0}
 --- !u!1001 &7389100184460941568
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -198,64 +205,8 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 100000, guid: ff686c2ea0f8b20428fd4a2f64767a8f, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 8917041512861632324}
-    - targetCorrespondingSourceObject: {fileID: 100000, guid: ff686c2ea0f8b20428fd4a2f64767a8f, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1735750372891999682}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ff686c2ea0f8b20428fd4a2f64767a8f, type: 3}
---- !u!1 &7389100184460910496 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 100000, guid: ff686c2ea0f8b20428fd4a2f64767a8f, type: 3}
-  m_PrefabInstance: {fileID: 7389100184460941568}
-  m_PrefabAsset: {fileID: 0}
---- !u!64 &8917041512861632324
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7389100184460910496}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 0
-  serializedVersion: 5
-  m_Convex: 1
-  m_CookingOptions: 30
-  m_Mesh: {fileID: 4300000, guid: ff686c2ea0f8b20428fd4a2f64767a8f, type: 3}
---- !u!136 &1735750372891999682
-CapsuleCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7389100184460910496}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Radius: 0.75
-  m_Height: 8.3
-  m_Direction: 1
-  m_Center: {x: -0.04, y: 3.7841647, z: -0.21567303}
 --- !u!4 &7389100184461329280 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 400000, guid: ff686c2ea0f8b20428fd4a2f64767a8f, type: 3}

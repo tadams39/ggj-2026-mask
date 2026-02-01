@@ -11,7 +11,9 @@ public class ScoreManager : MonoBehaviour
     [Header("References")]
     [SerializeField] private Transform playerTransform;
 
+    [SerializeField]
     private int currentScore = 0;
+    [SerializeField]
     private int highScore = 0;
     private Vector3 lastPlayerPosition;
     private bool isTracking = false;

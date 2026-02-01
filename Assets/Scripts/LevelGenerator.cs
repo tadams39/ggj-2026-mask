@@ -13,22 +13,78 @@ public class LevelGenerator : MonoBehaviour
     public GamePrefab[] prefabs;
     public MapChunk[] currentChunks;
 
+    [Header("Spawn Rate Scaling")]
+    public float obstacleStartMultiplier = 1f;
+    public float obstacleEndMultiplier = 2f;
+    public float scoreStartMultiplier = 0.25f;
+    public float scoreEndMultiplier = 1.5f;
+    public float timeToMaxSpawnRate = 300f; // 5 minutes
+
     private Dictionary<GamePrefab.PrefabType, GamePrefab[]> prefabsByType;
+    private float gameElapsedTime = 0f;
 
     public void Awake()
     {
         instance = this;
-         prefabsByType = prefabs
-        .GroupBy(p => p.myType) // or p.PrefabType depending on your field
-        .ToDictionary(
-            g => g.Key,
-            g => g.ToArray()
-        );
+        prefabsByType = prefabs
+            .GroupBy(p => p.myType)
+            .ToDictionary(
+                g => g.Key,
+                g => g.ToArray()
+            );
+    }
+
+    private void Start()
+    {
+        // Subscribe to game reset to reset the spawn timer
+        GameEvents.OnGameReset += HandleGameReset;
+    }
+
+    private void OnDestroy()
+    {
+        GameEvents.OnGameReset -= HandleGameReset;
+    }
+
+    private void Update()
+    {
+        // Track elapsed time for spawn rate scaling
+        gameElapsedTime += Time.deltaTime;
+    }
+
+    private void HandleGameReset()
+    {
+        // Reset spawn rate timer on full game reset
+        gameElapsedTime = 0f;
+    }
+
+    public float GetSpawnMultiplier(GamePrefab.PrefabType type)
+    {
+        float t = Mathf.Clamp01(gameElapsedTime / timeToMaxSpawnRate);
+
+        switch (type)
+        {
+            case GamePrefab.PrefabType.Obstacle:
+                return Mathf.Lerp(obstacleStartMultiplier, obstacleEndMultiplier, t);
+
+            case GamePrefab.PrefabType.Score:
+                return Mathf.Lerp(scoreStartMultiplier, scoreEndMultiplier, t);
+
+            case GamePrefab.PrefabType.Pickup:
+                // Pickups stay at base rate (or you can add separate settings)
+                return 1f;
+
+            default:
+                return 1f;
+        }
     }
 
     public GamePrefab[] GetPrefabsOfType(GamePrefab.PrefabType type)
     {
-        return prefabsByType[type];
+        if (prefabsByType.TryGetValue(type, out var result))
+        {
+            return result;
+        }
+        return new GamePrefab[0];
     }
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -45,7 +101,7 @@ public class LevelGenerator : MonoBehaviour
         {
             ProgressChunks();
         }
-        
+
         // Move the player to the 1st index start position
         var enterPoint = currentChunks[2].enterAnchor;
 

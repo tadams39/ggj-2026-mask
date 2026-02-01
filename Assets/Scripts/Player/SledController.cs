@@ -136,9 +136,11 @@ public class SledController : MonoBehaviour
 
     private void FixedUpdate()
     {
+        // Allow steering both on ground and in air
+        ApplySteering();
+
         if (groundDetector.IsGrounded)
         {
-            ApplySteering();
             ApplyAcceleration();
             ApplyKeelMechanic();
 
@@ -149,11 +151,6 @@ public class SledController : MonoBehaviour
 
             // Enforce minimum speed to keep the sled always moving
             EnforceMinimumSpeed();
-        }
-        else
-        {
-            // When airborne: no turning allowed - kill rotation
-            rb.angularVelocity = Vector3.zero;
         }
 
         // Apply additional gravity (always, even when airborne)
@@ -216,21 +213,29 @@ public class SledController : MonoBehaviour
 
     private void ApplySteering()
     {
-        if (Mathf.Abs(horizontalInput) < 0.01f) return;
+        if (Mathf.Abs(horizontalInput) < 0.01f)
+        {
+            // When not steering, apply damping to prevent unwanted spinning
+            rb.angularVelocity *= 0.9f;
+            return;
+        }
 
         // Calculate speed-dependent steering
-        // Reduce steering at very low speeds (less twitchy) AND at high speeds (wider turns)
+        // Gentle reduction at very high speeds only (for wider turns)
         float speedFactor = Mathf.Clamp01(currentSpeed / speedForFullReduction);
 
-        // At low speeds (< 3 m/s), reduce steering power
-        float lowSpeedFactor = Mathf.Clamp01(currentSpeed / 3f);
-
-        // Combine both factors: low speed reduction and high speed reduction
-        float steeringMultiplier = Mathf.Lerp(1f, minSteerFactor, speedFactor) * Mathf.Lerp(0.3f, 1f, lowSpeedFactor);
+        // Keep consistent turning at low-to-medium speeds, slight reduction at high speed
+        float steeringMultiplier = Mathf.Lerp(1f, minSteerFactor, speedFactor * speedFactor); // Square for gentler curve
 
         // Apply torque for steering
         float steerTorque = horizontalInput * steerStrength * steeringMultiplier;
         rb.AddTorque(Vector3.up * steerTorque, ForceMode.Acceleration);
+
+        // Cap angular velocity to prevent excessive spinning
+        if (rb.angularVelocity.magnitude > maxAngularVelocity * 0.5f)
+        {
+            rb.angularVelocity = rb.angularVelocity.normalized * (maxAngularVelocity * 0.5f);
+        }
     }
 
     private void ApplyAcceleration()

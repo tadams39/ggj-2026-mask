@@ -9,6 +9,7 @@ public class HealthBarUI : MonoBehaviour
     {
         // Subscribe to damage events to update UI
         GameEvents.OnDamageTaken += OnDamageTaken;
+        GameEvents.OnDamageOverTime += OnDamageOverTime;
         GameEvents.OnGameReset += OnGameReset;
 
         // Initialize to full health
@@ -18,10 +19,16 @@ public class HealthBarUI : MonoBehaviour
     private void OnDestroy()
     {
         GameEvents.OnDamageTaken -= OnDamageTaken;
+        GameEvents.OnDamageOverTime -= OnDamageOverTime;
         GameEvents.OnGameReset -= OnGameReset;
     }
 
     private void OnDamageTaken(float damage)
+    {
+        UpdateHealthBar();
+    }
+
+    private void OnDamageOverTime(float damage)
     {
         UpdateHealthBar();
     }
