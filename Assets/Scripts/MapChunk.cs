@@ -5,6 +5,13 @@ public class MapChunk : MonoBehaviour
     public Transform enterAnchor;
     public Transform exitAnchor;
 
+    public PrefabSpawnPoint[] spawnPoints;
+
+    public void Awake()
+    {
+        spawnPoints = GetComponentsInChildren<PrefabSpawnPoint>();
+    }
+
     public void OnEntered()
     {
         LevelGenerator.instance.ProgressChunks();
@@ -30,6 +37,12 @@ public class MapChunk : MonoBehaviour
 
         // Enable
         gameObject.SetActive(true);
+
+        foreach (var i in spawnPoints)
+        {
+            i.Spawn();
+        }
+        
     }
 
     public void UnloadChunk()
@@ -40,5 +53,9 @@ public class MapChunk : MonoBehaviour
         transform.eulerAngles = new Vector3(0,0,0);
 
         // Reset any internal state (chunk objects with resetters)
+         foreach (var i in spawnPoints)
+        {
+            i.Reset();
+        }
     }
 }

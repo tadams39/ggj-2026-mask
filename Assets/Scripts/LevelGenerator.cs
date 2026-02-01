@@ -1,18 +1,34 @@
 
+using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
 
 public class LevelGenerator : MonoBehaviour
 {
     public static LevelGenerator instance;
-    public static int CHUNK_LOOKAHEAD_COUNT = 3; // number of chunks to load at any time
+    public static int CHUNK_LOOKAHEAD_COUNT = 4; // number of chunks to load at any time
 
     public Transform playerTransform;
     public MapChunk[] chunks;
+    public GamePrefab[] prefabs;
     public MapChunk[] currentChunks;
+
+    private Dictionary<GamePrefab.PrefabType, GamePrefab[]> prefabsByType;
 
     public void Awake()
     {
         instance = this;
+         prefabsByType = prefabs
+        .GroupBy(p => p.myType) // or p.PrefabType depending on your field
+        .ToDictionary(
+            g => g.Key,
+            g => g.ToArray()
+        );
+    }
+
+    public GamePrefab[] GetPrefabsOfType(GamePrefab.PrefabType type)
+    {
+        return prefabsByType[type];
     }
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -30,8 +46,20 @@ public class LevelGenerator : MonoBehaviour
             ProgressChunks();
         }
         
-        // Move theplayer to the 1st index start position
-        playerTransform.position = currentChunks[2].enterAnchor.position + Vector3.up;
+        // Move the player to the 1st index start position
+        var enterPoint = currentChunks[2].enterAnchor;
+
+        // Calculate spawn position (higher up to prevent falling through)
+        Vector3 spawnOffset = Vector3.up * 5f + enterPoint.forward * 2f;
+        Vector3 finalPosition = enterPoint.position + spawnOffset;
+
+        Debug.Log($"Spawning player at chunk {currentChunks[2].name}");
+        Debug.Log($"Enter anchor position: {enterPoint.position}");
+        Debug.Log($"Final spawn position: {finalPosition}");
+
+        playerTransform.GetComponent<SledController>().TeleportTo(enterPoint, spawnOffset);
+
+        Debug.Log($"Player actual position after teleport: {playerTransform.position}");
     }
 
     public void ProgressChunks()
