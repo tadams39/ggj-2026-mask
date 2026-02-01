@@ -42,6 +42,11 @@ public class MapChunk : MonoBehaviour
         {
             i.Spawn();
         }
+
+        foreach(var k in GetComponentsInChildren<PlayerTrigger>())
+        {
+            k.isEnabled =true;
+        }
         
     }
 

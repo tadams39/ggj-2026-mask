@@ -60,6 +60,11 @@ public class LevelGenerator : MonoBehaviour
         playerTransform.GetComponent<SledController>().TeleportTo(enterPoint, spawnOffset);
 
         Debug.Log($"Player actual position after teleport: {playerTransform.position}");
+
+        foreach( var k in currentChunks[2].GetComponentsInChildren<PlayerTrigger>())
+        {
+            k.Disable();
+        }
     }
 
     public void ProgressChunks()

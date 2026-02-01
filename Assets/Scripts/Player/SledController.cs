@@ -36,6 +36,12 @@ public class SledController : MonoBehaviour
     [SerializeField] private float mass = 50f;
     [SerializeField] private float drag = 0.5f;
     [SerializeField] private float angularDrag = 2f;
+    [SerializeField] private float additionalGravity = 10f;
+
+    [Header("Slope Alignment")]
+    [SerializeField] private bool alignToSlope = true;
+    [SerializeField] private float slopeAlignmentSpeed = 5f;
+    [SerializeField] private float slopeAlignmentStrength = 0.8f;
 
     [Header("Debug")]
     [SerializeField] private bool showDebugGizmos = true;
@@ -81,8 +87,8 @@ public class SledController : MonoBehaviour
         rb.interpolation = RigidbodyInterpolation.Interpolate;
         rb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
 
-        // Freeze X and Z rotation (only allow Y-axis turning)
-        rb.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
+        // Allow all rotations for slope conforming (no constraints)
+        rb.constraints = RigidbodyConstraints.None;
 
         // Set max angular velocity
         rb.maxAngularVelocity = maxAngularVelocity;
@@ -101,7 +107,15 @@ public class SledController : MonoBehaviour
             ApplySteering();
             ApplyAcceleration();
             ApplyKeelMechanic();
+
+            if (alignToSlope)
+            {
+                AlignToSlope();
+            }
         }
+
+        // Apply additional gravity (always, even when airborne)
+        ApplyAdditionalGravity();
 
         ClampVelocity();
     }
@@ -220,6 +234,33 @@ public class SledController : MonoBehaviour
 
             rb.AddForce(keelForce, ForceMode.Force);
         }
+    }
+
+    private void ApplyAdditionalGravity()
+    {
+        // Apply extra downward force for faster, more dramatic downhill movement
+        Vector3 extraGravity = Vector3.down * additionalGravity;
+        rb.AddForce(extraGravity, ForceMode.Acceleration);
+    }
+
+    private void AlignToSlope()
+    {
+        // Calculate target rotation aligned with ground normal
+        Vector3 groundNormal = groundDetector.GroundNormal;
+
+        // Create a rotation that aligns up with ground normal, keeping forward direction
+        Vector3 currentForward = Vector3.ProjectOnPlane(transform.forward, groundNormal).normalized;
+        Quaternion targetRotation = Quaternion.LookRotation(currentForward, groundNormal);
+
+        // Smoothly interpolate current rotation toward target
+        Quaternion newRotation = Quaternion.Slerp(
+            transform.rotation,
+            targetRotation,
+            slopeAlignmentSpeed * Time.fixedDeltaTime * slopeAlignmentStrength
+        );
+
+        // Apply rotation via rigidbody for physics compatibility
+        rb.MoveRotation(newRotation);
     }
 
     private float CalculateKeelFactor(float lateralSlope)
