@@ -34,9 +34,14 @@ public class SledController : MonoBehaviour
 
     [Header("Physics")]
     [SerializeField] private float mass = 50f;
-    [SerializeField] private float drag = 0.5f;
+    [SerializeField] private float drag = 0.1f;  // Low drag for continuous movement
     [SerializeField] private float angularDrag = 2f;
     [SerializeField] private float additionalGravity = 10f;
+    [SerializeField] private float slopeGravityMultiplier = 2f;  // Extra pull down slopes
+
+    [Header("Minimum Speed")]
+    [SerializeField] private float minimumSpeed = 5f;  // Never go slower than this
+    [SerializeField] private float minSpeedBoostForce = 30f;  // Force to maintain minimum speed
 
     [Header("Slope Alignment")]
     [SerializeField] private bool alignToSlope = true;
@@ -98,6 +103,12 @@ public class SledController : MonoBehaviour
     {
         ReadInput();
         UpdateState();
+
+        // Check for reset input
+        if (Keyboard.current != null && Keyboard.current.rKey.wasPressedThisFrame)
+        {
+            ResetLevel();
+        }
     }
 
     private void FixedUpdate()
@@ -112,6 +123,9 @@ public class SledController : MonoBehaviour
             {
                 AlignToSlope();
             }
+
+            // Enforce minimum speed to keep the sled always moving
+            EnforceMinimumSpeed();
         }
 
         // Apply additional gravity (always, even when airborne)
@@ -241,6 +255,20 @@ public class SledController : MonoBehaviour
         // Apply extra downward force for faster, more dramatic downhill movement
         Vector3 extraGravity = Vector3.down * additionalGravity;
         rb.AddForce(extraGravity, ForceMode.Acceleration);
+
+        // Apply slope-directed gravity (always pull down the slope)
+        if (groundDetector.IsGrounded)
+        {
+            Vector3 groundNormal = groundDetector.GroundNormal;
+
+            // Calculate downslope direction (perpendicular to ground normal, in the plane)
+            Vector3 downslope = Vector3.ProjectOnPlane(Vector3.down, groundNormal).normalized;
+
+            // Apply force down the slope (stronger on steeper slopes)
+            float slopeSteepness = Vector3.Angle(Vector3.up, groundNormal) / 90f; // 0 = flat, 1 = vertical
+            Vector3 slopeForce = downslope * additionalGravity * slopeGravityMultiplier * slopeSteepness;
+            rb.AddForce(slopeForce, ForceMode.Acceleration);
+        }
     }
 
     private void AlignToSlope()
@@ -261,6 +289,23 @@ public class SledController : MonoBehaviour
 
         // Apply rotation via rigidbody for physics compatibility
         rb.MoveRotation(newRotation);
+    }
+
+    private void EnforceMinimumSpeed()
+    {
+        // Calculate forward speed (speed in the direction we're facing)
+        float forwardSpeed = Vector3.Dot(rb.linearVelocity, transform.forward);
+
+        // If moving too slowly, apply a boost
+        if (forwardSpeed < minimumSpeed)
+        {
+            // Calculate how much speed we need to add
+            float speedDeficit = minimumSpeed - forwardSpeed;
+
+            // Apply forward force to reach minimum speed
+            Vector3 boostForce = transform.forward * speedDeficit * minSpeedBoostForce;
+            rb.AddForce(boostForce, ForceMode.Force);
+        }
     }
 
     private float CalculateKeelFactor(float lateralSlope)
@@ -329,6 +374,22 @@ public class SledController : MonoBehaviour
         Teleport(targetPos, target.rotation);
     }
 
+    /// <summary>
+    /// Resets the level to the starting position.
+    /// </summary>
+    private void ResetLevel()
+    {
+        if (LevelGenerator.instance != null)
+        {
+            Debug.Log("Resetting level (R key pressed)");
+            LevelGenerator.instance.Reset();
+        }
+        else
+        {
+            Debug.LogWarning("Cannot reset: LevelGenerator.instance is null");
+        }
+    }
+
     private void OnDrawGizmos()
     {
         if (!Application.isPlaying || !showDebugGizmos) return;
@@ -372,4 +433,22 @@ public class SledController : MonoBehaviour
     public bool IsDrifting => isDrifting;
     public bool IsGrounded => groundDetector.IsGrounded;
     public Vector3 Velocity => rb.linearVelocity;
+
+    /// <summary>
+    /// Returns the normalized horizontal velocity direction.
+    /// Falls back to transform.forward if velocity is too low.
+    /// </summary>
+    public Vector3 GetForwardDirection()
+    {
+        Vector3 vel = rb.linearVelocity;
+        vel.y = 0;
+        if (vel.sqrMagnitude > 0.1f)
+        {
+            return vel.normalized;
+        }
+        // Fallback to transform forward if not moving
+        Vector3 fwd = transform.forward;
+        fwd.y = 0;
+        return fwd.normalized;
+    }
 }

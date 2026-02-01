@@ -52,15 +52,15 @@ public class MapChunk : MonoBehaviour
 
     public void UnloadChunk()
     {
-        // Disable self and move to 0,0,0
-        gameObject.SetActive(false);
-        transform.position = new Vector3(0,0,0);
-        transform.eulerAngles = new Vector3(0,0,0);
 
         // Reset any internal state (chunk objects with resetters)
          foreach (var i in spawnPoints)
         {
             i.Reset();
         }
+        // Disable self and move to 0,0,0
+        gameObject.SetActive(false);
+        transform.position = new Vector3(0,0,0);
+        transform.eulerAngles = new Vector3(0,0,0);
     }
 }

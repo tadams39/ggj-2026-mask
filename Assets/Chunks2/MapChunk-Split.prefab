@@ -45938,6 +45938,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7ca7270b84e277947a4b972c5de6eee2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
+  isEnabled: 1
   OnTriggerEntered:
     m_PersistentCalls:
       m_Calls:
@@ -47636,7 +47637,7 @@ SphereCollider:
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_Radius: 0.5
   m_Center: {x: 0, y: 0, z: 0}
@@ -47688,6 +47689,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: '::'
   enterAnchor: {fileID: 1893564096505048234}
   exitAnchor: {fileID: 8083873669174505986}
+  spawnPoints: []
 --- !u!1 &7312089162761944255
 GameObject:
   m_ObjectHideFlags: 0
@@ -47795,7 +47797,7 @@ SphereCollider:
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_Radius: 0.5
   m_Center: {x: 0, y: 0, z: 0}
