@@ -11689,11 +11689,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4d4de2b25782fe9498bce7d9d09c9728, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  minSpeed: 8
+  minSpeed: 6
   maxSpeed: 15
-  timeToMaxSpeed: 300
+  timeToMaxSpeed: 600
   maxDistanceFromPlayer: 50
   damageRadius: 10
-  damagePerSecond: 10
+  damagePerSecond: 5
   cloudHeight: 2
   logDistance: 0

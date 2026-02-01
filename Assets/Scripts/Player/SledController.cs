@@ -14,13 +14,13 @@ public class SledController : MonoBehaviour
     [SerializeField] private float maxSpeed = 40f;
     [SerializeField] private float brakeStrength = 2f;
 
+
     [Header("Steering")]
+    [SerializeField] private AnimationCurve steeringBySpeed;
+    [SerializeField] private AnimationCurve steeringBySpeedAirborne;
     [SerializeField] private float steerStrength = 40f;
     [SerializeField] private float maxAngularVelocity = 100f;
 
-    [Header("Speed-Dependent Steering")]
-    [SerializeField] private float minSteerFactor = 0.5f;  // Steering multiplier at max speed
-    [SerializeField] private float speedForFullReduction = 20f;  // Speed at which steering starts reducing
 
     [Header("Keel Mechanic")]
     [Tooltip("Degrees of lateral slope before drift starts")]
@@ -220,22 +220,25 @@ public class SledController : MonoBehaviour
             return;
         }
 
-        // Calculate speed-dependent steering
-        // Gentle reduction at very high speeds only (for wider turns)
-        float speedFactor = Mathf.Clamp01(currentSpeed / speedForFullReduction);
+        // Calculate forward velocity (only forward component, not total speed)
+        float forwardVelocity = Vector3.Dot(rb.linearVelocity, transform.forward);
 
-        // Keep consistent turning at low-to-medium speeds, slight reduction at high speed
-        float steeringMultiplier = Mathf.Lerp(1f, minSteerFactor, speedFactor * speedFactor); // Square for gentler curve
+        // Choose curve based on grounded state
+        AnimationCurve curve = groundDetector.IsGrounded ? steeringBySpeed : steeringBySpeedAirborne;
 
-        // Apply torque for steering
-        float steerTorque = horizontalInput * steerStrength * steeringMultiplier;
-        rb.AddTorque(Vector3.up * steerTorque, ForceMode.Acceleration);
+        // Evaluate curve with forward velocity to get steering multiplier
+        float steeringMultiplier = curve.Evaluate(forwardVelocity);
 
-        // Cap angular velocity to prevent excessive spinning
-        if (rb.angularVelocity.magnitude > maxAngularVelocity * 0.5f)
-        {
-            rb.angularVelocity = rb.angularVelocity.normalized * (maxAngularVelocity * 0.5f);
-        }
+        // Calculate target angular velocity for instant, constant turn rate
+        float targetAngularVelocity = horizontalInput * steerStrength * steeringMultiplier;
+
+        // Directly set Y angular velocity for instant response (no buildup)
+        // Preserve X and Z angular velocity for physics stability
+        rb.angularVelocity = new Vector3(
+            rb.angularVelocity.x,
+            targetAngularVelocity,
+            rb.angularVelocity.z
+        );
     }
 
     private void ApplyAcceleration()
