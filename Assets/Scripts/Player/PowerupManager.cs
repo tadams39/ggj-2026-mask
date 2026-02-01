@@ -106,6 +106,11 @@ public class PowerupManager : MonoBehaviour
         // Do nothing, powerup persists through level resets
     }
 
+    public Material speedMat;
+    public Material invinciblityMat;
+    public Material jumpMat;
+    public GameObject rider;
+
     private void ApplyPowerupEffect(GamePrefab.PickupType type)
     {
         if (sledController == null) return;
@@ -113,14 +118,20 @@ public class PowerupManager : MonoBehaviour
         switch (type)
         {
             case GamePrefab.PickupType.Speed:
+                Debug.Log("Got speed");
+                rider.GetComponent<MeshRenderer>().material = speedMat;
                 sledController.SpeedMultiplier = speedMultiplier;
                 break;
 
             case GamePrefab.PickupType.Invincibility:
+                Debug.Log("Got invincibility");
+                rider.GetComponent<MeshRenderer>().material = invinciblityMat;
                 sledController.IsInvincible = true;
                 break;
 
             case GamePrefab.PickupType.Jump:
+                Debug.Log("Got jump");
+                rider.GetComponent<MeshRenderer>().material = jumpMat;
                 sledController.CanJump = true;
                 sledController.GravityMultiplier = jumpGravityMultiplier;
                 break;
