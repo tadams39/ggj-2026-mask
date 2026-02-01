@@ -1,0 +1,13 @@
+fileFormatVersion: 2
+guid: 9dccc8e8f0da4494991c26ef59019551
+ShaderImporter:
+  defaultTextures: []
+  userData: 
+  assetBundleName: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 75514
+  packageName: Low Poly Seasonal Landscape
+  packageVersion: 1.0
+  assetPath: Assets/Standard Assets/Environment/Water (Basic)/Shaders/FXWaterBasic.shader
+  uploadId: 148582
