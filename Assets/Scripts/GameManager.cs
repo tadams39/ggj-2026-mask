@@ -2,23 +2,33 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
-
     public static GameManager instance;
+
+    [Header("References")]
     public LevelGenerator levelGenerator;
+    public DeathCloud deathCloud;
 
-    
+    [Header("Death Cloud Settings")]
+    [SerializeField] private GameObject deathCloudPrefab;
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    void Awake()
     {
         instance = this;
-        levelGenerator.Reset();
     }
 
-    // Update is called once per frame
-    void Update()
+    void Start()
     {
+        levelGenerator.Reset();
+        SpawnDeathCloud();
+    }
 
+    private void SpawnDeathCloud()
+    {
+        if (deathCloudPrefab != null && deathCloud == null)
+        {
+            GameObject cloudObj = Instantiate(deathCloudPrefab);
+            deathCloud = cloudObj.GetComponent<DeathCloud>();
+        }
     }
 
     // Debug button for resetting the level generator
@@ -33,5 +43,11 @@ public class GameManager : MonoBehaviour
     public void ProgressLevelChunks()
     {
         levelGenerator?.ProgressChunks();
+    }
+
+    // Full game reset (called when player dies)
+    public void ResetGame()
+    {
+        GameEvents.TriggerGameReset();
     }
 }

@@ -5,32 +5,37 @@ public class HealthBarUI : MonoBehaviour
 {
     [SerializeField] private Image healthFill;
 
-    private float maxHealth = 100f;
-    private float currentHealth;
-
-    void Start()
+    private void Start()
     {
-        currentHealth = maxHealth;
+        // Subscribe to damage events to update UI
+        GameEvents.OnDamageTaken += OnDamageTaken;
+        GameEvents.OnGameReset += OnGameReset;
+
+        // Initialize to full health
         UpdateHealthBar();
     }
 
-    public void TakeDamage(float damage)
+    private void OnDestroy()
     {
-        currentHealth -= damage;
-        currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
+        GameEvents.OnDamageTaken -= OnDamageTaken;
+        GameEvents.OnGameReset -= OnGameReset;
+    }
+
+    private void OnDamageTaken(float damage)
+    {
         UpdateHealthBar();
     }
 
-    public void Heal(float amount)
+    private void OnGameReset()
     {
-        currentHealth += amount;
-        currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
         UpdateHealthBar();
     }
 
     private void UpdateHealthBar()
     {
-        healthFill.fillAmount = currentHealth / maxHealth;
+        if (PlayerHealth.instance != null && healthFill != null)
+        {
+            healthFill.fillAmount = PlayerHealth.instance.CurrentHealth / PlayerHealth.instance.MaxHealth;
+        }
     }
 }
-

@@ -66,6 +66,16 @@ public class SledController : MonoBehaviour
     private float horizontalInput = 0f;
     private float verticalInput = 0f;
 
+    // Powerup modifiers (set by PowerupManager)
+    public float GravityMultiplier { get; set; } = 1f;
+    public float SpeedMultiplier { get; set; } = 1f;
+    public bool CanJump { get; set; } = false;
+    public bool IsInvincible { get; set; } = false;
+
+    // Jump settings
+    [Header("Jump (Powerup)")]
+    [SerializeField] private float jumpForce = 15f;
+
     private void Awake()
     {
         rb = GetComponent<Rigidbody>();
@@ -109,6 +119,19 @@ public class SledController : MonoBehaviour
         {
             ResetLevel();
         }
+
+        // Check for jump input (only when powerup is active)
+        if (CanJump && groundDetector.IsGrounded && Keyboard.current != null && Keyboard.current.spaceKey.wasPressedThisFrame)
+        {
+            Jump();
+        }
+    }
+
+    private void Jump()
+    {
+        // Apply upward force for jump
+        rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+        Debug.Log("Jump!");
     }
 
     private void FixedUpdate()
@@ -263,10 +286,13 @@ public class SledController : MonoBehaviour
 
     private void ApplyAdditionalGravity()
     {
+        // Apply gravity multiplier from powerups
+        float effectiveGravity = additionalGravity * GravityMultiplier;
+
         if (groundDetector.IsGrounded)
         {
             // When grounded: apply moderate extra gravity + slope acceleration
-            Vector3 extraGravity = Vector3.down * additionalGravity;
+            Vector3 extraGravity = Vector3.down * effectiveGravity;
             rb.AddForce(extraGravity, ForceMode.Acceleration);
 
             Vector3 groundNormal = groundDetector.GroundNormal;
@@ -281,13 +307,13 @@ public class SledController : MonoBehaviour
             Vector3 forwardSlope = Vector3.ProjectOnPlane(downslope, Vector3.up).normalized;
 
             // Apply forward force based on slope steepness (sled accelerates downhill!)
-            Vector3 downhillAcceleration = forwardSlope * additionalGravity * slopeGravityMultiplier * slopeSteepness;
+            Vector3 downhillAcceleration = forwardSlope * effectiveGravity * slopeGravityMultiplier * slopeSteepness;
             rb.AddForce(downhillAcceleration, ForceMode.Acceleration);
         }
         else
         {
             // When airborne: apply gentler gravity to allow for jumps and airtime
-            Vector3 airGravity = Vector3.down * (additionalGravity * 0.4f); // 40% of normal gravity
+            Vector3 airGravity = Vector3.down * (effectiveGravity * 0.4f); // 40% of normal gravity
             rb.AddForce(airGravity, ForceMode.Acceleration);
         }
     }
@@ -342,9 +368,12 @@ public class SledController : MonoBehaviour
 
     private void ClampVelocity()
     {
-        if (rb.linearVelocity.magnitude > maxSpeed)
+        // Apply speed multiplier from powerups
+        float effectiveMaxSpeed = maxSpeed * SpeedMultiplier;
+
+        if (rb.linearVelocity.magnitude > effectiveMaxSpeed)
         {
-            rb.linearVelocity = rb.linearVelocity.normalized * maxSpeed;
+            rb.linearVelocity = rb.linearVelocity.normalized * effectiveMaxSpeed;
         }
     }
 
