@@ -22,6 +22,11 @@ public class GameManager : MonoBehaviour
         SpawnDeathCloud();
     }
 
+    private void Update()
+    {
+        ResetAfterFallOut();
+    }
+
     private void SpawnDeathCloud()
     {
         if (deathCloudPrefab != null && deathCloud == null)
@@ -49,5 +54,20 @@ public class GameManager : MonoBehaviour
     public void ResetGame()
     {
         GameEvents.TriggerGameReset();
+    }
+
+    void ResetAfterFallOut()
+    {
+        float bounds = GetComponent<LevelGenerator>().currentChunks[GetComponent<LevelGenerator>().currentChunks.Length - 1].transform.position.y - 100;
+        float playerY = GetComponent<LevelGenerator>().playerTransform.position.y;
+
+        //Debug.Log("bounds: " + bounds);
+        //Debug.Log("player y: " + playerY);
+
+        if (playerY < bounds)
+        {
+            Debug.Log("We flew off of the track!");
+            ResetGame();
+        }
     }
 }
