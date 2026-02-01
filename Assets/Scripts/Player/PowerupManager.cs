@@ -118,17 +118,20 @@ public class PowerupManager : MonoBehaviour
         switch (type)
         {
             case GamePrefab.PickupType.Speed:
-                rider.GetComponent<MeshRenderer>().materials[0] = speedMat;
+                Debug.Log("Got speed");
+                rider.GetComponent<MeshRenderer>().material = speedMat;
                 sledController.SpeedMultiplier = speedMultiplier;
                 break;
 
             case GamePrefab.PickupType.Invincibility:
-                rider.GetComponent<MeshRenderer>().materials[0] = invinciblityMat;
+                Debug.Log("Got invincibility");
+                rider.GetComponent<MeshRenderer>().material = invinciblityMat;
                 sledController.IsInvincible = true;
                 break;
 
             case GamePrefab.PickupType.Jump:
-                rider.GetComponent<MeshRenderer>().materials[0] = jumpMat;
+                Debug.Log("Got jump");
+                rider.GetComponent<MeshRenderer>().material = jumpMat;
                 sledController.CanJump = true;
                 sledController.GravityMultiplier = jumpGravityMultiplier;
                 break;

@@ -199,7 +199,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   myType: 1
-  pickupType: 0
+  pickupType: 1
   obstacleDamage: 25
   audioSource: {fileID: 0}
   collectSound: {fileID: 0}
