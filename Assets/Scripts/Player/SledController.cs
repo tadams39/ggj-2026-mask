@@ -127,6 +127,11 @@ public class SledController : MonoBehaviour
             // Enforce minimum speed to keep the sled always moving
             EnforceMinimumSpeed();
         }
+        else
+        {
+            // When airborne: no turning allowed - kill rotation
+            rb.angularVelocity = Vector3.zero;
+        }
 
         // Apply additional gravity (always, even when airborne)
         ApplyAdditionalGravity();
