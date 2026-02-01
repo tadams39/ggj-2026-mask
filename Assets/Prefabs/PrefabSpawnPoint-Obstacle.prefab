@@ -122,5 +122,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   type: 0
-  baseChance: 0.9
+  baseChance: 0.09
   prefabInstance: {fileID: 0}
