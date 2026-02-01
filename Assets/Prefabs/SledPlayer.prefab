@@ -15,6 +15,8 @@ GameObject:
   - component: {fileID: 6071074673167817361}
   - component: {fileID: 3466749862248740547}
   - component: {fileID: 160809902577274949}
+  - component: {fileID: 6428411513094269347}
+  - component: {fileID: 992395122398289975}
   m_Layer: 0
   m_Name: SledPlayer
   m_TagString: Untagged
@@ -100,10 +102,65 @@ MonoBehaviour:
   accelerationPower: 800
   maxSpeed: 40
   brakeStrength: 2
-  steerStrength: 80
-  maxAngularVelocity: 100
-  minSteerFactor: 0.5
-  speedForFullReduction: 20
+  steeringBySpeed:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1.6
+      inSlope: -0.009889549
+      outSlope: -0.009889549
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0.36879292
+    - serializedVersion: 3
+      time: 8.666666
+      value: 1.4209839
+      inSlope: -0.023004703
+      outSlope: -0.023004703
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 25.08333
+      value: 1.0047607
+      inSlope: -0.0253537
+      outSlope: -0.0253537
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  steeringBySpeedAirborne:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0.8
+      inSlope: -0.025
+      outSlope: -0.025
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 20
+      value: 0.3
+      inSlope: -0.025
+      outSlope: -0.025
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  steerStrength: 2
+  maxAngularVelocity: 10
   lateralResistanceThreshold: 15
   maxResistanceForce: 800
   driftCoefficient: 0.1
@@ -185,6 +242,38 @@ SphereCollider:
   serializedVersion: 3
   m_Radius: 0.3
   m_Center: {x: 0.4, y: 0.3, z: -0.6}
+--- !u!114 &6428411513094269347
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5423737494335452615}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c9803cdb2bc251b43830bc3271ec478d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  maxHealth: 100
+  obstacleDamage: 25
+  invulnerabilityDuration: 1
+  currentHealth: 0
+--- !u!114 &992395122398289975
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5423737494335452615}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c204898b85d61a047b1c66802edfbc0a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  defaultDuration: 10
+  coinDurationBonus: 1
+  speedMultiplier: 1.5
+  jumpGravityMultiplier: 0.3
 --- !u!1001 &1585619877672258561
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -249,14 +338,135 @@ PrefabInstance:
       propertyPath: m_Name
       value: Sleigh_Wooden
       objectReference: {fileID: 0}
+    - target: {fileID: 6232840109640691096, guid: b07b226a4007b804e8041ba51687016d, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 4737481896828743969, guid: b07b226a4007b804e8041ba51687016d, type: 3}
     m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedGameObjects:
+    - targetCorrespondingSourceObject: {fileID: 5058760443538921207, guid: b07b226a4007b804e8041ba51687016d, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 8106997981501493380}
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 5584326643144395853, guid: b07b226a4007b804e8041ba51687016d, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 8092364431076912072}
   m_SourcePrefab: {fileID: 100100000, guid: b07b226a4007b804e8041ba51687016d, type: 3}
 --- !u!4 &5779546804913396470 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5058760443538921207, guid: b07b226a4007b804e8041ba51687016d, type: 3}
   m_PrefabInstance: {fileID: 1585619877672258561}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &6592921988009492556 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5584326643144395853, guid: b07b226a4007b804e8041ba51687016d, type: 3}
+  m_PrefabInstance: {fileID: 1585619877672258561}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &8092364431076912072
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6592921988009492556}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b2e03c69efd365945b0897f8ba765f8e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  physicsTarget: {fileID: 74972151268025293}
+  horizontalFollowSpeed: 20
+  verticalFollowSpeed: 8
+  maxVerticalOffset: 2
+  rotationFollowSpeed: 10
+  pitchRollSmoothing: 5
+  visualOffset: {x: 0, y: 0, z: 0}
+  showDebugGizmos: 0
+--- !u!1001 &8578071734967203695
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 5779546804913396470}
+    m_Modifications:
+    - target: {fileID: -8679921383154817045, guid: 81820dbe887015347a09b9b554d6f5c5, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.17943327
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 81820dbe887015347a09b9b554d6f5c5, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.17943327
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 81820dbe887015347a09b9b554d6f5c5, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0.17943327
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 81820dbe887015347a09b9b554d6f5c5, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0.040422723
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 81820dbe887015347a09b9b554d6f5c5, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.23281007
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 81820dbe887015347a09b9b554d6f5c5, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0.049784347
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 81820dbe887015347a09b9b554d6f5c5, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 81820dbe887015347a09b9b554d6f5c5, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 81820dbe887015347a09b9b554d6f5c5, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 81820dbe887015347a09b9b554d6f5c5, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 81820dbe887015347a09b9b554d6f5c5, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 81820dbe887015347a09b9b554d6f5c5, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: -90
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 81820dbe887015347a09b9b554d6f5c5, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -7918335002988649766, guid: 81820dbe887015347a09b9b554d6f5c5, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 23c3a7e5fd492cb4ebde9c62cc469d3e, type: 2}
+    - target: {fileID: -7841618005442866069, guid: 81820dbe887015347a09b9b554d6f5c5, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 81820dbe887015347a09b9b554d6f5c5, type: 3}
+      propertyPath: m_Name
+      value: Canoe2THICk
+      objectReference: {fileID: 0}
+    - target: {fileID: 9196038722108697792, guid: 81820dbe887015347a09b9b554d6f5c5, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 23c3a7e5fd492cb4ebde9c62cc469d3e, type: 2}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 81820dbe887015347a09b9b554d6f5c5, type: 3}
+--- !u!4 &8106997981501493380 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 81820dbe887015347a09b9b554d6f5c5, type: 3}
+  m_PrefabInstance: {fileID: 8578071734967203695}
   m_PrefabAsset: {fileID: 0}
