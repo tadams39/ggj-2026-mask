@@ -204,16 +204,7 @@ MonoBehaviour:
   clankThreshhold: 0.2
   diff: 0
   audioClips:
-  - {fileID: 8300000, guid: 915fb7312ae9bb943976542e89f52c69, type: 3}
-  - {fileID: 8300000, guid: f70a06361eb832f4e82ad20e7252cd3f, type: 3}
-  - {fileID: 8300000, guid: ec8c667eb3f888945974274197e27643, type: 3}
-  - {fileID: 8300000, guid: 07f17d5e003f88f4492d1da10f4cc620, type: 3}
-  - {fileID: 8300000, guid: 6f6a91a00cd035242ba0d9aa0d1a9680, type: 3}
-  - {fileID: 8300000, guid: ba5a6e192131d4e4ab4e09a32ed4cb86, type: 3}
-  - {fileID: 8300000, guid: 676d80d2f2ba59d4da83a8f8e14770ef, type: 3}
-  - {fileID: 8300000, guid: ad05bbe553b16234ab29fe268e73fcad, type: 3}
-  - {fileID: 8300000, guid: 0cbec3a4ff12d8c4695ff3b83aa71019, type: 3}
-  - {fileID: 8300000, guid: f1c543745430c41429dfb070e58afa07, type: 3}
+  - {fileID: 8300000, guid: fc56435aac062084483e5078607c53f2, type: 3}
 --- !u!82 &6834333829197610340
 AudioSource:
   m_ObjectHideFlags: 0
